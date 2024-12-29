@@ -23,7 +23,7 @@ router.post('/agreements', upload.single('pdfFile'), async (req, res) => {
     }
 });
 
-router.get('/agreements', async (req, res) => {
+router.get('/all-agreements', async (req, res) => {
     try {
         const agreements = await Agreement.find();
         res.status(200).json(agreements);
