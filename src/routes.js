@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const pdfParse = require('pdf-parse');
 const Agreement = require('./models/agreementModel');
+const sendToChatGPT = require('./chatgptService');
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -9,6 +10,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.post('/agreements', upload.single('pdfFile'), async (req, res) => {
     try {
         const { companyName, agreementName } = req.body;
+        const { update } = req.query;
 
         // Log the request body and file
         console.log('Request Body:', req.body);
@@ -16,43 +18,55 @@ router.post('/agreements', upload.single('pdfFile'), async (req, res) => {
 
         if (!req.file) {
             console.error('No file uploaded');
-            // Commenting out the return statement to proceed further
-            // return res.status(400).json({ message: 'No file uploaded' });
+            return res.status(400).json({ message: 'No file uploaded' });
         }
 
-        let pdfText = '';
-        if (req.file) {
-            const pdfBuffer = req.file.buffer;
+        const pdfBuffer = req.file.buffer;
 
-            // Parse the PDF content
-            const pdfData = await pdfParse(pdfBuffer);
-            pdfText = pdfData.text;
+        // Parse the PDF content
+        const pdfData = await pdfParse(pdfBuffer);
+        const pdfText = pdfData.text;
 
-            // Log the parsed PDF text
-            console.log('Parsed PDF Text:', pdfText);
+        // Log the parsed PDF text
+        //console.log('Parsed PDF Text:', pdfText);
 
-            if (pdfText) {
-                // Perform regex operations on the PDF text
-                const regex = /(?<=4\. Period of Work and Milestones)[\s\S]*?(?=5\. Authorities)/g;
-                const matches = pdfText.match(regex);
+        // Perform regex operations on the PDF text
+        const regex = /(?<=4\. Period of Work and Milestones)[\s\S]*?(?=5\. Authorities)/g;
+        const matches = pdfText.match(regex);
+        console.log('Matches Response:', matches);
+        
+        let aiOutput = null;
+        if (matches) {
+            // Send the matched text to ChatGPT
+            const chatGPTResponse = await sendToChatGPT(matches[0]);
+            console.log('ChatGPT Response:', chatGPTResponse);
+            aiOutput = chatGPTResponse;
+        }
 
-                if (matches) {
-                    // Log or process the matches as needed
-                    console.log('Matches found:', matches);
-                } else {
-                    console.log('No matches found.');
-                }
-            } else {
-                console.log('Failed to parse PDF.');
+        // Find the existing agreement
+        let agreement = await Agreement.findOne({ companyName, agreementName });
+
+        if (!agreement) {
+            if (update) {
+                return res.status(404).json({ message: 'Agreement not found' });
             }
+            // Create a new agreement if it doesn't exist
+            agreement = new Agreement({
+                companyName,
+                agreementName,
+                versions: []
+            });
         }
 
-        const agreement = new Agreement({
-            companyName,
-            agreementName,
-            pdfFile: req.file ? req.file.buffer : null,
-            pdfText: pdfText || null
-        });
+        // Add the new version
+        const newVersion = {
+            pdfData: pdfBuffer,
+            aiOutput: aiOutput,
+            versionNumber: agreement.versions.length + 1,
+            uploadDate: new Date()
+        };
+
+        agreement.versions.push(newVersion);
 
         await agreement.save();
         res.status(201).json({ message: 'Agreement processed successfully', pdfText });

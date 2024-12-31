@@ -3,6 +3,25 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+const versionSchema = new mongoose.Schema({
+    pdfData: {
+        type: Buffer,
+        required: true
+    },
+    aiOutput: {
+        type: String,
+        required: false
+    },
+    versionNumber: {
+        type: Number,
+        required: true
+    },
+    uploadDate: {
+        type: Date,
+        required: true
+    }
+});
+
 const agreementSchema = new mongoose.Schema({
     companyName: {
         type: String,
@@ -12,10 +31,7 @@ const agreementSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    pdfFile: {
-        type: Buffer,
-        required: true
-    }
+    versions: [versionSchema]
 });
 
 const Agreement = mongoose.model('Agreement', agreementSchema, process.env.COLLECTION_NAME);
