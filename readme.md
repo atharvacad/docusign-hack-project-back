@@ -1,32 +1,29 @@
-# Docusign Hack Project Backend
+# Project Name
 
-This is the backend API for the Docusign Hack Project. It allows you to create agreements by uploading PDF files and retrieve all agreements stored in the MongoDB database.
+## Description
 
-## Prerequisites
-
-- Node.js (v14 or higher)
-- MongoDB (local or cloud instance)
+A brief description of your project.
 
 ## Installation
 
-1. **Clone the repository:**
+### Prerequisites
+
+- Docker
+- Node.js
+- npm
+
+### Steps
+
+1. Clone the repository:
 
     ```sh
-    git clone https://github.com/your-username/docusign-hack-project-back.git
-    cd docusign-hack-project-back
+    git clone https://github.com/your-repo.git
+    cd your-repo
     ```
 
-2. **Install dependencies:**
+2. Create a `.env` file in the root directory with the following content:
 
-    ```sh
-    npm install
-    ```
-
-3. **Create a `.env` file:**
-
-    Create a `.env` file in the root directory of the project with the following content:
-
-    ```properties
+    ```env
     MONGODB_URL=mongodb+srv://<username>:<password>@<cluster-url>
     DATABASE_NAME=docusign-hack-project
     COLLECTION_NAME=agreements
@@ -34,69 +31,32 @@ This is the backend API for the Docusign Hack Project. It allows you to create a
     OPENAI_API_KEY=your_openai_api_key
     ```
 
-    Replace `<username>`, `<password>`, and `<cluster-url>` with your MongoDB credentials and cluster URL. Replace `your_openai_api_key` with your actual OpenAI API key.
-
-## Running the Application
-
-1. **Start MongoDB:**
-
-    Ensure that MongoDB is running on your local machine or in a Docker container, or ensure that your MongoDB cloud instance is accessible.
-
-2. **Run the application:**
+3. Build the Docker image:
 
     ```sh
-    node src/app.js
+    docker build -t docusign-hack-project-back .
     ```
 
-    The server will start on the port specified in the `.env` file (default is 3000).
+4. Run the Docker container:
 
-## API Endpoints
+    ```sh
+    docker run -p 3000:3000 --env-file .env docusign-hack-project-back
+    ```
 
-### Create or Update Agreement
+5. Access the API:
 
-- **URL:** `/api/agreements`
-- **Method:** `POST`
-- **Description:** Create a new agreement or update an existing agreement by uploading a PDF file.
-- **Query Parameter:**
-  - `update` (boolean, optional): If set to `true`, the endpoint will update an existing agreement. If not provided or set to `false`, the endpoint will create a new agreement.
-- **Request Body:**
-  - `companyName` (string): The name of the company.
-  - `agreementName` (string): The name of the agreement.
-  - `pdfFile` (file): The PDF file of the agreement.
-- **Response:**
-  - `201 Created`: Agreement processed successfully.
-  - `404 Not Found`: Agreement not found (when `update=true`).
-  - `500 Internal Server Error`: An error occurred while processing the agreement.
+    ```markdown
+    http://localhost:3000/api/all-agreements
+    ```
 
-#### Example using Postman
+## Usage
 
-1. **Create a New Agreement:**
-    - **URL:** `http://localhost:3000/api/agreements`
-    - **Method:** `POST`
-    - **Body:** `form-data`
-        - `companyName`: Enter the company name (e.g., "Example Company").
-        - `agreementName`: Enter the agreement name (e.g., "Example Agreement").
-        - `pdfFile`: Select a PDF file to upload.
-    - **Send the Request.**
+Provide examples of how to use your project.
 
-2. **Update an Existing Agreement:**
-    - **URL:** `http://localhost:3000/api/agreements?update=true`
-    - **Method:** `POST`
-    - **Body:** `form-data`
-        - `companyName`: Enter the company name (e.g., "Example Company").
-        - `agreementName`: Enter the agreement name (e.g., "Example Agreement").
-        - `pdfFile`: Select a PDF file to upload.
-    - **Send the Request.**
+## Contributing
 
-### Get All Agreements
-
-- **URL:** `http://localhost:3000/api/all-agreements`
-- **Method:** `GET`
-- **Description:** Retrieve all agreements stored in the MongoDB database.
-- **Response:**
-  - `200 OK`: A list of all agreements.
-  - `500 Internal Server Error`: An error occurred while retrieving the agreements.
+Provide guidelines for contributing to your project.
 
 ## License
 
-This project is licensed under the MIT License.
+Include the license information for your project.
