@@ -3,9 +3,13 @@ const multer = require('multer');
 const pdfParse = require('pdf-parse');
 const Agreement = require('./models/agreementModel');
 const sendToChatGPT = require('./chatgptService');
+const cors = require('cors'); // Import the cors package
+
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
+router.use(cors()); // Enable CORS for all routes
+
 
 router.post('/agreements', upload.single('pdfFile'), async (req, res) => {
     try {

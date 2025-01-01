@@ -90,7 +90,7 @@ This is the backend API for the Docusign Hack Project. It allows you to create a
 
 ### Get All Agreements
 
-- **URL:** `/api/all-agreements`
+- **URL:** `http://localhost:3000/api/all-agreements`
 - **Method:** `GET`
 - **Description:** Retrieve all agreements stored in the MongoDB database.
 - **Response:**
