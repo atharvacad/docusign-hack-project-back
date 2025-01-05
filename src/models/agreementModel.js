@@ -4,8 +4,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const versionSchema = new mongoose.Schema({
-    pdfData: {
-        type: Buffer,
+    filePath: {
+        type: String,
         required: true
     },
     aiOutput: {

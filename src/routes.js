@@ -1,15 +1,15 @@
 const express = require('express');
 const multer = require('multer');
 const pdfParse = require('pdf-parse');
+const fs = require('fs');
+const path = require('path');
 const Agreement = require('./models/agreementModel');
 const sendToChatGPT = require('./chatgptService');
 const cors = require('cors'); // Import the cors package
 
-
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 router.use(cors()); // Enable CORS for all routes
-
 
 router.post('/agreements', upload.single('pdfFile'), async (req, res) => {
     try {
@@ -30,9 +30,6 @@ router.post('/agreements', upload.single('pdfFile'), async (req, res) => {
         // Parse the PDF content
         const pdfData = await pdfParse(pdfBuffer);
         const pdfText = pdfData.text;
-
-        // Log the parsed PDF text
-        //console.log('Parsed PDF Text:', pdfText);
 
         // Perform regex operations on the PDF text
         const regex = /(?<=4\. Period of Work and Milestones)[\s\S]*?(?=5\. Authorities)/g;
@@ -62,11 +59,19 @@ router.post('/agreements', upload.single('pdfFile'), async (req, res) => {
             });
         }
 
+        // Determine the version number
+        const versionNumber = agreement.versions.length + 1;
+
+        // Save the PDF file to the agreement-file folder
+        const fileName = `${companyName}-${agreementName}-version-${versionNumber}.pdf`;
+        const filePath = path.join(__dirname, 'agreement-file', fileName);
+        fs.writeFileSync(filePath, pdfBuffer);
+
         // Add the new version
         const newVersion = {
-            pdfData: pdfBuffer,
+            filePath: filePath,
             aiOutput: aiOutput,
-            versionNumber: agreement.versions.length + 1,
+            versionNumber: versionNumber,
             uploadDate: new Date()
         };
 

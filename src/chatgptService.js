@@ -6,7 +6,22 @@ dotenv.config();
 const sendToChatGPT = async (text) => {
     try {
         const gptQuery = `\
-Here is the text which contains milestones related data and delivery date, next part is the detailed steps along with its delivery date. Details steps names only no description need but take status, dates. Dont forgot to take details steps of each milestones along with dates and status. Don't include any explanation in your response; rather, just generate the JSON object code.
+Here is the text which contains milestones related data and delivery date, next part is the detailed steps along with its delivery date. Details steps names only no description need but take status, dates. Dont forgot to take details steps of each milestones along with dates and status. Don't include any explanation in your response; rather, just generate the JSON object code. Json Object should look like this {
+"milestones": [
+{
+"name": "",
+"delivery_date": "",
+"status": "",
+"detailed_steps": [
+{
+"name": "",
+"status": "",
+"date": ""
+}
+]
+}
+]
+}.
 
 ${text}`;
 
