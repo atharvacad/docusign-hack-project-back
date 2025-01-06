@@ -4,8 +4,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const versionSchema = new mongoose.Schema({
-    filePath: {
-        type: String,
+    fileData: {
+        type: Buffer,
         required: true
     },
     aiOutput: {
@@ -19,6 +19,10 @@ const versionSchema = new mongoose.Schema({
     uploadDate: {
         type: Date,
         required: true
+    },
+    esignSent: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -28,6 +32,14 @@ const agreementSchema = new mongoose.Schema({
         required: true
     },
     agreementName: {
+        type: String,
+        required: true
+    },
+    contactName: {
+        type: String,
+        required: true
+    },
+    contactEmail: {
         type: String,
         required: true
     },
