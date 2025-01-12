@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const pdfParse = require('pdf-parse');
 const Agreement = require('../models/agreementModel');
-const sendToChatGPT = require('../chatgptService');
+const { sendToChatGPT } = require('../chatgptService'); // Correctly import sendToChatGPT
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -36,6 +36,12 @@ router.post('/agreements', upload.single('pdfFile'), async (req, res) => {
         if (matches) {
             // Send the matched text to ChatGPT
             const chatGPTResponse = await sendToChatGPT(matches[0]);
+            console.log('ChatGPT Response:', chatGPTResponse);
+            aiOutput = chatGPTResponse;
+        }else {
+            // Send the full PDF text to ChatGPT
+            const fullText = `${pdfText}\n\nThis is the full PDF text for the contract agreement.`;
+            const chatGPTResponse = await sendToChatGPT(fullText);
             console.log('ChatGPT Response:', chatGPTResponse);
             aiOutput = chatGPTResponse;
         }

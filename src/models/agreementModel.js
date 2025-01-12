@@ -12,6 +12,10 @@ const versionSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    aiInsight: {
+        type: String,
+        required: false
+    },
     versionNumber: {
         type: Number,
         required: true
