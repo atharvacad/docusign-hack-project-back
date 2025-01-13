@@ -1,6 +1,6 @@
 const express = require('express');
 const Agreement = require('../models/agreementModel');
-const { sendToChatGPTWithQuery2, sendToChatGPTWithQuery3 } = require('../chatgptService');
+const { sendToChatGPTWithQuery2, sendToChatGPTWithQuery3, chatWithGPT } = require('../chatgptService'); // Import chatWithGPT
 
 const router = express.Router();
 
@@ -31,7 +31,6 @@ router.post('/ai-insight-agreement', async (req, res) => {
         if (version.aiInsight) {
             console.log('AI Insight already present:', version.aiInsight);
             return res.status(200).json(version.aiInsight);
-            //return res.status(200).json({ message: 'AI Insight fetched successfully', aiInsight: version.aiInsight });
         }
 
         // Log the aiOutput to the console
@@ -77,16 +76,6 @@ router.post('/compare-ai-insight-agreement', async (req, res) => {
             return res.status(404).json({ message: 'One or both versions not found' });
         }
 
-        // Check if aiInsight is already present for both versions
-        // if (versionA.aiInsight && versionB.aiInsight) {
-        //     console.log('AI Insight A already present:', versionA.aiInsight);
-        //     console.log('AI Insight B already present:', versionB.aiInsight);
-        //     const comparisonText = `Compare the following AI insights:\n\nAI Insight A:\n${versionA.aiInsight}\n\nAI Insight B:\n${versionB.aiInsight}`;
-        //     const chatGPTResponse = await sendToChatGPTWithQuery3(comparisonText);
-        //     console.log('ChatGPT Response:', chatGPTResponse);
-        //     return res.status(200).json({ message: 'AI Insight comparison fetched successfully', comparison: chatGPTResponse });
-        // }
-
         // Log the aiOutputs to the console
         console.log('AI Output A:', versionA.aiOutput);
         console.log('AI Output B:', versionB.aiOutput);
@@ -96,9 +85,25 @@ router.post('/compare-ai-insight-agreement', async (req, res) => {
         const chatGPTResponse = await sendToChatGPTWithQuery3(comparisonText);
         console.log('ChatGPT Response:', chatGPTResponse);
 
-        //res.status(200).json({ message: 'AI Insight comparison fetched successfully', comparison: chatGPTResponse });
         res.status(200).json({ comparison: chatGPTResponse });
     
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+});
+
+router.post('/chat-ai-insight-agreement', async (req, res) => {
+    try {
+        const { initialResponse, userQuestion } = req.body;
+        // Log the input values
+        console.log('Received values:', { initialResponse, userQuestion });
+        
+        // User Q&A with ChatGPT based on the initial comparison output
+        const chatGPTResponse = await chatWithGPT(initialResponse, userQuestion);
+        console.log('ChatGPT Q&A Response:', chatGPTResponse);
+        return res.status(200).json({ message: 'ChatGPT Q&A response fetched successfully', response: chatGPTResponse });
+
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ message: 'Internal server error', error: error.message });

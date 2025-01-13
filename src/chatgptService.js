@@ -192,4 +192,40 @@ const sendToChatGPTWithQuery3 = async (text) => {
     }
 };
 
-module.exports = { sendToChatGPT, sendToChatGPTWithQuery2,sendToChatGPTWithQuery3 };
+const chatWithGPT = async (initialResponse, userQuestion) => {
+    try {
+        //console.error(' ChatGPT Input Text:', text);
+        const query4 = `Based on the following initial response: ${initialResponse}, answer the user's question: ${userQuestion} , give me the response in 100 words only`;
+
+    // console.error(' ChatGPT Input Text:', text);
+    console.error(' ChatGPT Query:', query4);   
+
+        const body = {
+            "model": "gpt-3.5-turbo",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": query4
+                }
+            ]
+        };
+
+        const response = await axios({
+            method: "post",
+            url: "https://api.openai.com/v1/chat/completions",
+            data: body,
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+            }
+        });
+
+        const gptResponse = response.data.choices[0].message.content;
+        console.error(' ChatGPT:', gptResponse);
+        return gptResponse;
+    } catch (error) {
+        console.error('Error sending data to ChatGPT:', error);
+        throw error;
+    }
+};
+module.exports = { sendToChatGPT, sendToChatGPTWithQuery2,sendToChatGPTWithQuery3 ,chatWithGPT};
